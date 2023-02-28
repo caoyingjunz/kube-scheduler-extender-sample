@@ -1,6 +1,9 @@
 package main
 
 import (
+	"log"
+	"net/http"
+
 	restful "github.com/emicklei/go-restful/v3"
 )
 
@@ -16,8 +19,9 @@ type Resource struct{}
 
 func (s Resource) WebService() *restful.WebService {
 	ws := new(restful.WebService)
+
 	ws.
-		Path(apiPrefix).
+		Path("").
 		Consumes(restful.MIME_XML, restful.MIME_JSON).
 		Produces(restful.MIME_JSON, restful.MIME_XML)
 	//tags := []string{"scheduler"}
@@ -28,9 +32,13 @@ func (s Resource) WebService() *restful.WebService {
 }
 
 func (s Resource) version(req *restful.Request, res *restful.Response) {
-	res.WriteEntity(map[string]string{"version": "1.0.0"})
+	_ = res.WriteEntity(map[string]string{"version": "1.0.0"})
 }
 
 func main() {
+	s := Resource{}
+	restful.DefaultContainer.Add(s.WebService())
 
+	log.Println("starting scheduler extender server")
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
